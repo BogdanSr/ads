@@ -49,7 +49,10 @@ void sortItems(vector<int> *numbers, int divider)
                 iMin = j;
             }
         }
-        swap(numbers->at(i), numbers->at(iMin));
+        
+        if (i != iMin) {
+            swap(numbers->at(i), numbers->at(iMin));
+        }
     }
 }
 
