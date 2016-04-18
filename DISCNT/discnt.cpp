@@ -31,7 +31,6 @@ double calculateSum(vector<int> *numbers, int divider, double percentage)
     {
         result += numbers->at(i);
     }
-    
     return result;
 }
 
