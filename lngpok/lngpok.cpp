@@ -159,9 +159,9 @@ int calculate(vector<int> *numbers, int total)
             
             int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
             
-            int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
+            bool delta_length = (chunk_length - hole_length) > (max_length - max_hole_length);
             
-            if (chunk_length > max_length && hole_length <= available_items)
+            if (chunk_length > max_length && delta_length && hole_length <= available_items)
             {
                 max_length = chunk_length;
                 
