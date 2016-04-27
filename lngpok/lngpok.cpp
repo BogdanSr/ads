@@ -94,6 +94,10 @@ int group_ending_index(vector<int> *numbers, int start_index)
 
 int find_max_length(vector<int> *numbers)
 {
+    if (numbers->size() == 0) {
+        return 0;
+    }
+    
     int i = 0;
     
     int current = 1;
@@ -122,7 +126,7 @@ int calculate(vector<int> *numbers, int total)
     int result = 0 ;
     int available_items = total;
     
-    while (available_items > 0)
+    while (available_items > 0 && numbers->size() > 0)
     {
         int index = 0;
         
@@ -152,6 +156,8 @@ int calculate(vector<int> *numbers, int total)
             int first_right_element = numbers->at(right_beginning);
             
             int hole_length = first_right_element - last_left_element - 1;
+            
+            int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
             
             int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
             
