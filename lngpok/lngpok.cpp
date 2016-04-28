@@ -230,7 +230,7 @@ int main(int argc, const char * argv[])
 {
     vector<int> *numbers = new vector<int>();
     
-    ifstream in("discnt.in",ios::in);
+    ifstream in("lngpok.in",ios::in);
     
     int number;
     
@@ -254,7 +254,7 @@ int main(int argc, const char * argv[])
     int result = calculate(numbers, number_of_zeros);
     
     ofstream output;
-    output.open ("discnt.out");
+    output.open ("lngpok.out");
     
     output << result;
     
