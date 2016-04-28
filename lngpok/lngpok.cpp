@@ -12,6 +12,8 @@
 #include <string.h>
 #include <iomanip>
 
+#include <unistd.h>
+
 using namespace std;
 
 void quickSort(vector<int> *numbers, int left, int right)
@@ -103,10 +105,13 @@ int find_max_length(vector<int> *numbers)
     int current = 1;
     int max = 1;
     
+    //    cout<<endl;
+    
     while (i < numbers->size() - 1)
     {
         if ((numbers->at(i) + 1) == numbers->at(i + 1)) {
             current++;
+            //            cout<<"! "<<(numbers->at(i) + 1)<<" ! "<<numbers->at(i + 1)<<" "<<current<<endl;
         }
         else {
             current = 1;
@@ -123,10 +128,14 @@ int find_max_length(vector<int> *numbers)
 
 int calculate(vector<int> *numbers, int total)
 {
+    if (numbers->size() == 0) {
+        return total;
+    }
+    
     int result = 0 ;
     int available_items = total;
     
-    while (available_items > 0 && numbers->size() > 0)
+    while (available_items > 0)
     {
         int index = 0;
         
@@ -157,11 +166,27 @@ int calculate(vector<int> *numbers, int total)
             
             int hole_length = first_right_element - last_left_element - 1;
             
+            // not enough space
+            if (hole_length > available_items) {
+                index = left_ending + 1;
+                continue;
+            }
+            
             int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
             
-            bool delta_length = (chunk_length - hole_length) > (max_length - max_hole_length);
+            int current_delta = (chunk_length - hole_length);
+            int max_delta     = (max_length - max_hole_length);
             
-            if (chunk_length > max_length && delta_length && hole_length <= available_items)
+            bool should_change_max = false;
+            
+            if (current_delta > max_delta) {
+                should_change_max = true;
+            }
+            else if (current_delta == max_delta && hole_length < max_hole_length) {
+                should_change_max = true;
+            }
+            
+            if (should_change_max)
             {
                 max_length = chunk_length;
                 
@@ -205,7 +230,7 @@ int main(int argc, const char * argv[])
 {
     vector<int> *numbers = new vector<int>();
     
-    ifstream in("lngpok.in",ios::in);
+    ifstream in("discnt.in",ios::in);
     
     int number;
     
@@ -227,11 +252,11 @@ int main(int argc, const char * argv[])
     }
     
     int result = calculate(numbers, number_of_zeros);
-
-    ofstream output;
-    output.open ("lngpok.out");
     
-    output<<result;
+    ofstream output;
+    output.open ("discnt.out");
+    
+    output << result;
     
     output.close();
     
