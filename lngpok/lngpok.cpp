@@ -161,13 +161,10 @@ int find_max_length(vector<int> *numbers)
     int current = 1;
     int max = 1;
     
-//    cout<<endl;
-    
     while (i < numbers->size() - 1)
     {
         if ((numbers->at(i) + 1) == numbers->at(i + 1)) {
             current++;
-//            cout<<"! "<<(numbers->at(i) + 1)<<" ! "<<numbers->at(i + 1)<<" "<<current<<endl;
         }
         else {
             current = 1;
@@ -221,19 +218,7 @@ Search_Info next_index(vector<int> *numbers, int index, int total)
         }
         
         int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
-//
-//        int current_delta = (chunk_length - hole_length);
-//        int max_delta     = (max_length - max_hole_length);
-//        
-//        bool should_change_max = false;
-//        
-//        if (current_delta > max_delta) {
-//            should_change_max = true;
-//        }
-//        else if (current_delta == max_delta && hole_length < max_hole_length) {
-//            should_change_max = true;
-//        }
-//        
+      
         if (true)
         {
             max_length = chunk_length;
@@ -260,11 +245,6 @@ Search_Info next_index(vector<int> *numbers, int index, int total)
             numbers->insert(numbers->begin() + i, ++value);
         }
         available_items -= max_hole_length;
-        
-//        cout <<endl<< "Changed Numbers:\n";
-//        for (int i=0; i<numbers->size(); i++) {
-//            cout << numbers->at(i) << ' ';
-//        }
     }
     
     result.beginning_index = max_left_beginning;
@@ -377,7 +357,7 @@ Search_Info step(vector<int> *numbers, int left_index, int right_index, int tota
     return result;
 }
 
-int calculate3(vector<int> *numbers, int total)
+int calculate(vector<int> *numbers, int total)
 {
     int result = 0;
     
@@ -392,7 +372,7 @@ int calculate3(vector<int> *numbers, int total)
     
     int index = 0;
 
-    while (index < numbers->size() - 1)
+    while (index < numbers->size())
     {
         vector<int> *copy = new vector<int>(*numbers);
         
@@ -407,8 +387,6 @@ int calculate3(vector<int> *numbers, int total)
         }
 
         index = info.ending_index - info.used_total;
-        
-        cout<<endl<<"index: "<<index<<endl;
         
         int available_total = total - info.used_total;
         while (available_total > 0)
@@ -433,167 +411,8 @@ int calculate3(vector<int> *numbers, int total)
     return result;
 }
 
-//int calculate2(vector<int> *numbers, int total)
-//{
-//    int result = 0;
-//    
-//    if (numbers->size() == 0) {
-//        return total;
-//    }
-//    
-//    if (total == 0) {
-//        int r = find_max_length(numbers);
-//        return r;
-//    }
-//    
-//    Search_Info info = find_initial_indexes(numbers, total);
-//    cout<<endl<<numbers->at(info.beginning_index)<<" "<<numbers->at(info.ending_index)<<endl;
-//    
-//    if (info.used_total == 0) {
-//        int r = find_max_length(numbers);
-//        r += total;
-//        return r;
-//    }
-//
-//    int available_total = total - info.used_total;
-//    while (available_total > 0)
-//    {
-//        Search_Info temp_info = step(numbers, info.beginning_index, info.ending_index, available_total);
-//        
-//        if (temp_info.used_total == 0) {
-//            result += available_total;
-//            break;
-//        }
-//
-//        info = temp_info;
-//        available_total -= info.used_total;
-//    }
-//    
-////    result += (info.ending_index - info.beginning_index);
-//    int r = find_max_length(numbers);
-//    result = r + available_total;
-//    
-//    
-//    return result;
-//}
-
-int calculate(vector<int> *numbers, int total)
-{
-    if (numbers->size() == 0) {
-        return total;
-    }
-    
-    int result = 0 ;
-    int available_items = total;
-    
-    int group_beginning = 0;
-    int group_ending = 0;
-    
-    while (available_items > 0)
-    {
-        int index = 0;
-        
-        int max_left_beginning = 0;
-        int max_left_ending = 0;
-        int max_right_beginning = 0;
-        int max_right_ending = 0;
-        int max_hole_length = 0;
-        
-        int max_length = 0;
-        bool changed = false;
-        
-        while (index < numbers->size() - 1)
-        {
-            int left_ending = group_ending_index(numbers, index);
-            
-            int right_beginning = left_ending + 1;
-            
-            // TODO: XZ
-            if (right_beginning >= numbers->size() - 1) {
-                break;
-            }
-            
-            int right_ending = group_ending_index(numbers, right_beginning);
-            
-            int last_left_element   = numbers->at(left_ending);
-            int first_right_element = numbers->at(right_beginning);
-            
-            int hole_length = first_right_element - last_left_element - 1;
-            
-            // not enough space
-            if (hole_length > available_items) {
-                index = left_ending + 1;
-                continue;
-            }
-            
-            int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
-    
-            int current_delta = (chunk_length - hole_length);
-            int max_delta     = (max_length - max_hole_length);
-            
-            bool should_change_max = false;
-            
-            if (current_delta > max_delta) {
-                should_change_max = true;
-            }
-            else if (current_delta == max_delta && hole_length < max_hole_length) {
-                should_change_max = true;
-            }
-            
-            if (should_change_max)
-            {
-                max_length = chunk_length;
-                
-                max_left_beginning = index;
-                max_left_ending = left_ending;
-                
-                max_right_beginning = right_beginning;
-                max_right_ending = right_ending;
-                
-                max_hole_length = hole_length;
-                
-                changed = true;
-            }
-            
-            index = left_ending + 1;
-        }
-        
-        if (changed)
-        {
-            int value = numbers->at(max_left_ending);
-            for (int i = max_right_beginning; i < max_right_beginning + max_hole_length; ++i)
-            {
-                numbers->insert(numbers->begin() + i, ++value);
-            }
-            available_items -= max_hole_length;
-            
-//            cout <<endl<< "Changed Numbers:\n";
-//            for (int i=0; i<numbers->size(); i++) {
-//                cout << numbers->at(i) << ' ';
-//            }
-            
-            group_beginning = max_left_beginning;
-            group_ending = max_right_ending + max_hole_length;
-        }
-        else {
-            break;
-        }
-    }
-    
-    int max = find_max_length(numbers);
-    
-//    cout<<endl<<"test result: "<< (group_ending - group_beginning);
-    
-    result = max + available_items;
-
-    return result;
-}
-
-
 int main(int argc, const char * argv[])
 {
-//    printWorkingDirectory();
-    
     vector<int> *numbers = new vector<int>();
     
     ifstream in("lngpok.in",ios::in);
@@ -606,21 +425,9 @@ int main(int argc, const char * argv[])
     
     in.close();
     
-//    cout << "Initial Numbers:\n";
-//    for (int i=0; i<numbers->size(); i++) {
-//        cout << numbers->at(i) << ' ';
-//    }
-    
     sort(numbers);
     
-//    cout <<endl<< "Sorted Numbers:\n";
-//    for (int i=0; i<numbers->size(); i++) {
-//        cout << numbers->at(i) << ' ';
-//    }
-    
     int number_of_zeros = get_number_of_zeros(numbers);
-    
-//    cout<<endl<<"zeros: "<<number_of_zeros<<endl<<" count: "<< numbers->size()<<endl;
     
     remove_duplicates(numbers);
     if (numbers->size() >= 1) {
@@ -629,26 +436,8 @@ int main(int argc, const char * argv[])
         }
     }
     
-//    cout<<endl<<"size: "<< numbers->size()<<endl;
+    int result = calculate(numbers, number_of_zeros);
     
-//    cout <<endl<< "Without Zero Numbers:\n";
-//    for (int i=0; i<numbers->size(); i++) {
-//        cout << numbers->at(i) << ' ';
-//    }
-//    
-//    cout<<endl;
-    
-    int result = calculate3(numbers, number_of_zeros);
-    
-//    cout <<endl<< "Final Numbers:\n";
-//    for (int i=0; i<numbers->size(); i++) {
-//        cout << numbers->at(i) << ' ';
-//    }
-    
-//    cout<<endl;
-    
-//    cout<<endl<<"result: "<<result<<endl;
-
     ofstream output;
     output.open ("lngpok.out");
     
