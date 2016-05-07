@@ -103,8 +103,6 @@ bool check_if_enough_total(Hamster **items, int count, int available_total, int 
 
 int main(int argc, const char * argv[])
 {
-    printWorkingDirectory();
-    
     vector<int> *numbers = new vector<int>();
     
     ifstream in("hamstr.in", ios::in);
