@@ -12,8 +12,6 @@
 #include <string.h>
 #include <iomanip>
 
-#include "Utils.h"
-
 #include <unistd.h>
 
 using namespace std;
@@ -167,8 +165,6 @@ int main(int argc, const char * argv[])
     output << result;
 
     output.close();
-    
-    cin.get();
     
     return 0;
 }
