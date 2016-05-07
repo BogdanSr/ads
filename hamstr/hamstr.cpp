@@ -52,8 +52,12 @@ inline bool compare(Hamster *lhs, Hamster *rhs, int count)
     return l_sum > r_sum;
 }
 
-void quickSort(Hamster **items, int left, int right, int count)
+void quickSort(Hamster **items, int left, int right, int count, int stop_index)
 {
+    if (left > stop_index || right < stop_index) {
+        return;
+    }
+    
     int i = left, j = right;
     Hamster *tmp;
     Hamster *pivot = items[(left + right) / 2];
@@ -75,15 +79,16 @@ void quickSort(Hamster **items, int left, int right, int count)
     };
     
     if (left < j)
-        quickSort(items, left, j, count);
+        quickSort(items, left, j, count, stop_index);
     if (i < right)
-        quickSort(items, i, right, count);
+        quickSort(items, i, right, count, stop_index);
 }
 
 void sort(Hamster **items, int count, int max_count)
 {
     if (count <= 0) return;
-    quickSort(items, 0, count - 1, max_count);
+    int stop_index = count - max_count;
+    quickSort(items, 0, count - 1, max_count, stop_index);
 }
 
 bool check_if_enough_total(Hamster **items, int count, int available_total, int start_index, int c)
