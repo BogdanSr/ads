@@ -11,11 +11,7 @@
 #include <vector>
 #include <string.h>
 #include <iomanip>
-
-//#include "Utils.h"
-
 #include <unistd.h>
-char *getcwd(char *buf, size_t size);
 
 /*
  1 (7) - 0 10 15 50 0 14 9 12 40
@@ -38,22 +34,21 @@ char *getcwd(char *buf, size_t size);
 
 using namespace std;
 
-struct Search_Info
+struct search_result
 {
-    int beginning_index;
-    int ending_index;
-    int used_total;
+    int next_group_index;
+    int total;
 };
 
-Search_Info initialize_search_info() {
-    Search_Info info;
-    info.beginning_index = 0;
-    info.ending_index = 0;
-    info.used_total = 0;
+search_result initialize_search_info()
+{
+    search_result info;
+    info.next_group_index = 0;
+    info.total = 0;
     return info;
 }
 
-void quickSort(vector<int> *numbers, int left, int right)
+void quick_sort(vector<int> *numbers, int left, int right)
 {
     int i = left, j = right;
     int tmp;
@@ -74,16 +69,16 @@ void quickSort(vector<int> *numbers, int left, int right)
     };
     
     if (left < j)
-        quickSort(numbers, left, j);
+        quick_sort(numbers, left, j);
     if (i < right)
-        quickSort(numbers, i, right);
+        quick_sort(numbers, i, right);
 }
 
 
 void sort(vector<int> *numbers)
 {
     int n = (int)numbers->size();
-    quickSort(numbers, 0, n - 1);
+    quick_sort(numbers, 0, n - 1);
 }
 
 void remove_duplicates(vector<int> *numbers)
@@ -110,25 +105,6 @@ int get_number_of_zeros(vector<int> *numbers)
         }
     }
     return result;
-}
-
-int group_beginning_index(vector<int> *numbers, int end_index)
-{
-    int index = end_index;
-    
-    for (int i = end_index; i > 0; --i)
-    {
-        int left  = numbers->at(i) - 1;
-        int right = numbers->at(i - 1);
-        if (left == right) {
-            index = i - 1;
-        }
-        else {
-            break;
-        }
-    }
-    
-    return index;
 }
 
 int group_ending_index(vector<int> *numbers, int start_index)
@@ -179,233 +155,83 @@ int find_max_length(vector<int> *numbers)
     return max;
 }
 
-Search_Info next_index(vector<int> *numbers, int index, int total)
+search_result step(vector<int> *numbers, int beginning_index, int total)
 {
-    int available_items = total;
+    search_result result = initialize_search_info();
     
-    int max_left_beginning = 0;
-    int max_left_ending = 0;
-    int max_right_beginning = 0;
-    int max_right_ending = 0;
-    int max_hole_length = 0;
+    int count = (int)numbers->size();
+    int index = beginning_index;
+    int available_total = total;
     
-    int max_length = 0;
-    bool changed = false;
+    int length = 0;
     
-    Search_Info result = initialize_search_info();
+    int last, first, step_total;
+    bool is_first = true;
     
-    while (!changed)
+    while (available_total > 0 && index < count)
     {
-        int left_ending = group_ending_index(numbers, index);
+        int ending_index = group_ending_index(numbers, index);
         
-        int right_beginning = left_ending + 1;
+        if (is_first) {
+            length += (ending_index - index + 1);
+        }
         
-        if (right_beginning >= numbers->size() - 1) {
+        int next_beginning_index = ending_index + 1;
+        
+        if (is_first) {
+            is_first = false;
+            result.next_group_index = next_beginning_index;
+        }
+        if (next_beginning_index >= count) {
             break;
         }
         
-        int right_ending = group_ending_index(numbers, right_beginning);
+        last  = numbers->at(ending_index);
+        first = numbers->at(next_beginning_index);
         
-        int last_left_element   = numbers->at(left_ending);
-        int first_right_element = numbers->at(right_beginning);
+        step_total = first - last - 1;
         
-        int hole_length = first_right_element - last_left_element - 1;
-        
-        // not enough space
-        if (hole_length > available_items) {
-            index = left_ending + 1;
-            continue;
+        if (step_total > available_total) {
+            break;
         }
+        int next_ending_index = group_ending_index(numbers, next_beginning_index);
         
-        int chunk_length = hole_length + (left_ending - index + 1) + (right_ending - right_beginning + 1);
-      
-        if (true)
-        {
-            max_length = chunk_length;
-            
-            max_left_beginning = index;
-            max_left_ending = left_ending;
-            
-            max_right_beginning = right_beginning;
-            max_right_ending = right_ending;
-            
-            max_hole_length = hole_length;
-            
-            changed = true;
-        }
+        length += (next_ending_index - next_beginning_index + 1);
+        length += step_total;
+        available_total -= step_total;
         
-        index = left_ending + 1;
+        index = next_ending_index;
     }
     
-    if (changed)
-    {
-        int value = numbers->at(max_left_ending);
-        for (int i = max_right_beginning; i < max_right_beginning + max_hole_length; ++i)
-        {
-            numbers->insert(numbers->begin() + i, ++value);
-        }
-        available_items -= max_hole_length;
-    }
+    length += available_total;
     
-    result.beginning_index = max_left_beginning;
-    result.ending_index = max_right_ending + max_hole_length;
-    result.used_total = max_hole_length;
+    result.total = length;
     
-    return result;
-}
-
-
-Search_Info move_right(vector<int> *numbers, int index, int total)
-{
-    Search_Info result = initialize_search_info();
-    
-    int left_index = index + 1;
-    
-    if (left_index >= numbers->size()) {
-        return result;
-    }
-    
-    int right_index = group_ending_index (numbers, left_index);
-    
-    result.beginning_index = left_index;
-    result.ending_index = right_index;
-    
-    int left  = numbers->at(left_index);
-    int main  = numbers->at(index);
-    
-    int used_total = left - main - 1;
-    if (used_total <= total) {
-        result.used_total = left - main - 1;
-    }
-    
-    return result;
-}
-
-Search_Info move_left(vector<int> *numbers, int index, int total)
-{
-    Search_Info result = initialize_search_info();
-    
-    int left_index = index - 1;
-    
-    if (left_index < 0) {
-        return result;
-    }
-    
-    int right_index = group_beginning_index(numbers, left_index);
-    
-    result.beginning_index = right_index;
-    result.ending_index = left_index;
-    
-    int right  = numbers->at(left_index);
-    int main   = numbers->at(index);
-    
-    int used_total = main - right - 1;
-    
-    if (used_total <= total) {
-        result.used_total = used_total;
-    }
-
-    return result;
-}
-
-
-Search_Info step(vector<int> *numbers, int left_index, int right_index, int total)
-{
-    Search_Info result = initialize_search_info();
-    
-    Search_Info right = move_right(numbers, right_index, total);
-    Search_Info left  = move_left (numbers, left_index, total);
-    
-    if (right.used_total == 0 && left.used_total == 0) {
-        return result;
-    }
-
-    bool use_left  = right.used_total == 0;
-    
-    int right_diff = (right.ending_index - right.beginning_index) - right.used_total;
-    int left_diff  = (left.ending_index -   left.beginning_index) - left.used_total;
-    
-    int hole_beginnig;
-    
-    int left_bound, right_bound, used_total;
-    
-    if (left_diff >= right_diff && use_left) {
-        hole_beginnig = left.ending_index + 1;
-        
-        used_total = left.used_total;
-        left_bound = left.beginning_index;
-        right_bound = right_index + used_total;
-    }
-    else {
-        hole_beginnig = right_index + 1;
-        
-        used_total = right.used_total;
-        left_bound = left_index;
-        right_bound = right.ending_index + used_total;
-    }
-    
-    int value = numbers->at(hole_beginnig - 1);
-    for (int i = hole_beginnig; i < hole_beginnig + used_total; ++i)
-    {
-        numbers->insert(numbers->begin() + i, ++value);
-    }
-    
-    result.used_total = used_total;
-    result.beginning_index = left_bound;
-    result.ending_index = right_bound;
-
     return result;
 }
 
 int calculate(vector<int> *numbers, int total)
 {
-    int result = 0;
-    
-    if (numbers->size() == 0) {
+    int count = (int)numbers->size();
+    if (0 == count) {
         return total;
     }
-    
-    if (total == 0) {
-        int r = find_max_length(numbers);
-        return r;
+    if (0 == total) {
+        return find_max_length(numbers);
     }
     
+    int result = 0;
+    
     int index = 0;
-
-    while (index < numbers->size())
+    
+    while (index < count)
     {
-        vector<int> *copy = new vector<int>(*numbers);
+        search_result r = step(numbers, index, total);
         
-        Search_Info info = next_index(copy, index, total);
-        
-        if (info.used_total == 0) {
-            int r = find_max_length(numbers) + total;
-            if (r > result) {
-                result = r;
-            }
-            break;
+        if (r.total > result) {
+            result = r.total;
         }
-
-        index = info.ending_index - info.used_total;
-        
-        int available_total = total - info.used_total;
-        while (available_total > 0)
-        {
-            Search_Info temp_info = step(copy, info.beginning_index, info.ending_index, available_total);
-            
-            if (temp_info.used_total == 0) {
-                break;
-            }
-            
-            info = temp_info;
-            available_total -= info.used_total;
-        }
-        
-        int r = find_max_length(copy) + available_total;
-        if (r > result) {
-            result = r;
-        }
-        delete copy;
+        index = r.next_group_index;
     }
     
     return result;
@@ -418,11 +244,9 @@ int main(int argc, const char * argv[])
     ifstream in("lngpok.in",ios::in);
     
     int number;
-    
     while (in >> number) {
         numbers->push_back(number);
     }
-    
     in.close();
     
     sort(numbers);
@@ -442,11 +266,8 @@ int main(int argc, const char * argv[])
     output.open ("lngpok.out");
     
     output << result;
-
-    output.close();
     
-    //delete vector
-    cin.get();
+    output.close();
     
     return 0;
 }
