@@ -11,7 +11,6 @@
 #include <vector>
 #include <string.h>
 #include <iomanip>
-
 #include <unistd.h>
 
 using namespace std;
@@ -52,7 +51,7 @@ inline bool compare(Hamster *lhs, Hamster *rhs, int count)
     return l_sum > r_sum;
 }
 
-void quickSort(Hamster **items, int left, int right, int count, int stop_index)
+void quick_sort(Hamster **items, int left, int right, int count, int stop_index)
 {
     if (left > stop_index || right < stop_index) {
         return;
@@ -79,16 +78,16 @@ void quickSort(Hamster **items, int left, int right, int count, int stop_index)
     };
     
     if (left < j)
-        quickSort(items, left, j, count, stop_index);
+        quick_sort(items, left, j, count, stop_index);
     if (i < right)
-        quickSort(items, i, right, count, stop_index);
+        quick_sort(items, i, right, count, stop_index);
 }
 
 void sort(Hamster **items, int count, int max_count)
 {
     if (count <= 0) return;
     int stop_index = count - max_count;
-    quickSort(items, 0, count - 1, max_count, stop_index);
+    quick_sort(items, 0, count - 1, max_count, stop_index);
 }
 
 bool check_if_enough_total(Hamster **items, int count, int available_total, int start_index, int c)
@@ -106,40 +105,12 @@ bool check_if_enough_total(Hamster **items, int count, int available_total, int 
     return true;
 }
 
-int main(int argc, const char * argv[])
+int calculate_hamsters_total(Hamster **items, int count, int food)
 {
-    vector<int> *numbers = new vector<int>();
-    
-    ifstream in("hamstr.in", ios::in);
-    
-    int number;
-    
-    while (in >> number) {
-        numbers->push_back(number);
-    }
-    
-    in.close();
-    
-    int food = numbers->at(0);
-    numbers->erase(numbers->begin());
-    int count = numbers->at(0);
-    numbers->erase(numbers->begin());
-    
-    Hamster **items = new Hamster*[count];
-    
-    for (int i = 0; i < count; ++i)
-    {
-        Hamster *item = new Hamster();
-        int c = 2 * i;
-        item->H = numbers->at(c);
-        item->G = numbers->at(c + 1);
-        items[i] = item;
-    }
-    delete numbers;
+    int result = 0;
     
     int left = 0;
     int right = count - 1;
-    int result = 0;
     
     while (left >= 0 && right <= count && left <= right)
     {
@@ -161,12 +132,47 @@ int main(int argc, const char * argv[])
             left = index + 1;
         }
     }
+    return result;
+}
+
+int main(int argc, const char * argv[])
+{
+    vector<int> *numbers = new vector<int>();
+    
+    ifstream in("hamstr.in", ios::in);
+    
+    int number;
+    while (in >> number) {
+        numbers->push_back(number);
+    }
+    in.close();
+    
+    int food, count;
+    
+    food = numbers->at(0);
+    numbers->erase(numbers->begin());
+    count = numbers->at(0);
+    numbers->erase(numbers->begin());
+    
+    cout<<endl<<"Food: "<<food<<" Count: "<<count<<endl;
+    
+    Hamster **items = new Hamster*[count];
+    
+    for (int i = 0; i < count; ++i)
+    {
+        Hamster *item = new Hamster();
+        int c = 2 * i;
+        item->H = numbers->at(c);
+        item->G = numbers->at(c + 1);
+        items[i] = item;
+    }
+    delete numbers;
+    
+    int result = calculate_hamsters_total(items, count, food);
     
     ofstream output;
     output.open ("hamstr.out");
-    
-    output << result;
-
+    output<<result;
     output.close();
     
     return 0;
