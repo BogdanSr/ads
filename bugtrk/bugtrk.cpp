@@ -40,22 +40,27 @@ long long calculate(long long n, long long w, long long h)
     long long min = std::min(w,h);
     long long max = std::max(w,h);
     
+    long long max_value = max_index * max;
+    long long min_value = min_index * min;
+    
     while (sum < n)
     {
-        if (min_index * min > max_index * max )
+        if (min_value > max_value )
         {
             max_index++;
+            max_value += max;
             
             sum += min_index;
         }
         else {
             min_index++;
+            min_value += min;
             
             sum += max_index;
         }
     }
     
-    long long result = std::max( (max_index * max), (min_index * min));
+    long long result = std::max(min_value, max_value);
     
     return result;
 }
@@ -77,7 +82,7 @@ int main(int argc, const char * argv[])
     n = numbers->at(0);
     w = numbers->at(1);
     h = numbers->at(2);
-
+    
     long long result = calculate(n, w, h);
     
     ofstream output;
