@@ -42,7 +42,7 @@ public:
     
     string label;
     vector<Edge *> *out_edges;
-    vector<Edge *> *in_edges;
+    //vector<Edge *> *in_edges;
     
     int in_counter = 0;
     
@@ -50,7 +50,7 @@ public:
     {
         this->label = label;
         this->out_edges = new vector<Edge*>();
-        this->in_edges  = new vector<Edge*>();
+        //this->in_edges  = new vector<Edge*>();
     }
     
     void print()
@@ -147,7 +147,7 @@ Graph *get_data()
         edges->push_back(edge);
         
         start_vertex->out_edges->push_back(edge);
-        end_vertex->in_edges->push_back(edge);
+        //end_vertex->in_edges->push_back(edge);
         
         end_vertex->in_counter += 1;
     }
