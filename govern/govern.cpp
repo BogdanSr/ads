@@ -205,7 +205,7 @@ int main(int argc, const char * argv[])
     ofstream output;
     output.open ("govern.out");
     
-    for (size_t i = result->size() - 1; i > 0; --i) {
+    for (int i = result->size() - 1; i >= 0; i--) {
         output<<result->at(i)->label<<endl;
     }
 
