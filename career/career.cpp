@@ -93,8 +93,6 @@ long long solve(vector<int> *numbers, int count)
 
 int main(int argc, const char * argv[])
 {
-    printWorkingDirectory();
-    
     vector<int> *numbers = new vector<int>();
     
     ifstream in("career.in",ios::in);
